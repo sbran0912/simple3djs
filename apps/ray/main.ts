@@ -1,22 +1,15 @@
 import {
-  background,
+  beginScene,
   DrawStyle,
   drawLine,
   drawMesh,
   drawPoint,
-  getHeight,
-  getWidth,
   init,
-  lookAtMatrix,
   makeCubeMesh,
   makePyramidMesh,
-  perspectiveMatrix,
+  makeScene,
   rotateAround,
   rotateMatrix,
-  setFog,
-  setLightDirection,
-  setProjection,
-  setView,
   startAnimation,
   Vec3,
   type Mesh,
@@ -72,14 +65,18 @@ const pyrWhite: ShapeStyle = {
 
 const screenW = 1600;
 const screenH = 1000;
-const fovY = 1.2;
-const zNear = 0.1;
-const zFar = 1000;
 const coneLines = 20;
 const camHeight = 140;
 
-const camTarget = new Vec3(0, 0, 0);
-const camUp = new Vec3(0, 1, 0);
+const scene = makeScene();
+scene.cam.target = new Vec3(0, 0, 0);
+scene.cam.up = new Vec3(0, 1, 0);
+scene.cam.fovY = 1.2;
+scene.cam.near = 0.1;
+scene.cam.far = 1000;
+scene.sunDir = new Vec3(1, 0, 0);
+scene.fog = { enabled: true, near: 100, far: 600, color: { r: 0.25, g: 0.25, b: 0.25, a: 1 } };
+
 const camRadius = Math.sqrt(40 * 40 + 180 * 180);
 let timeAccum = 0;
 let coneRotY = 0;
@@ -113,20 +110,12 @@ function draw(): void {
   }
 
   const camAngle = timeAccum * 0.15;
-  const camPos = new Vec3(
+  scene.cam.pos = new Vec3(
     Math.sin(camAngle) * camRadius,
     camHeight,
     Math.cos(camAngle) * camRadius,
   );
-  const view = lookAtMatrix(camPos, camTarget, camUp);
-  const proj = perspectiveMatrix(fovY, getWidth() / getHeight(), zNear, zFar);
-  const sunDir = new Vec3(1, 0, 0);
-  const camLight = sunDir.transformDir(view);
-  setLightDirection(camLight.x, camLight.y, camLight.z);
-
-  setProjection(proj);
-  setView(view);
-  background([40, 40, 40]);
+  beginScene(scene);
 
   // Alle Bodies zeichnen (Mesh einmal erzeugt, Modell-Matrix explizit).
   for (const { body, style } of bodies) {
@@ -186,5 +175,4 @@ try {
 } catch (e) {
   console.error(String(e));
 }
-setFog(100, 600, 0.25, 0.25, 0.25, 1);
 startAnimation(draw);

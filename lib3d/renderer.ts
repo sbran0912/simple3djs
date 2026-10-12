@@ -18,8 +18,14 @@ import {
   GL_POINTS,
   GL_TRIANGLES,
 } from "./gl";
-import { identityMatrix, type Matrix4x4 } from "./mat4";
+import {
+  identityMatrix,
+  lookAtMatrix,
+  perspectiveMatrix,
+  type Matrix4x4,
+} from "./mat4";
 import { createProgram, kFragSrc, kVertSrc } from "./shader";
+import { Vec3 } from "./vec";
 
 // ---- Oeffentliche Typen ----
 
@@ -665,6 +671,88 @@ export function setView(m: Matrix4x4): void {
   if (gl) {
     gl.uniformMatrix4fv(locView, false, viewUniform);
   }
+}
+
+// =================================================================
+// KAMERA- UND SZENEN-BUENDEL
+//
+// Reine Daten-Huellen plus Apply-Funktionen. Sie befuellen weiterhin die
+// expliziten Setter; es entsteht KEIN globaler Modell-/Kamera-Zustand.
+// =================================================================
+
+/** Camera buendelt die perspektivischen Parameter und die Blickrichtung. */
+export class Camera {
+  constructor(
+    public pos: Vec3 = new Vec3(50, 100, 200),
+    public target: Vec3 = new Vec3(0, 0, 0),
+    public up: Vec3 = new Vec3(0, 1, 0),
+    public fovY = 1.2,
+    public near = 0.1,
+    public far = 1000,
+  ) {}
+
+  /** view liefert die View-Matrix (reine Mathe). */
+  view(): Matrix4x4 {
+    return lookAtMatrix(this.pos, this.target, this.up);
+  }
+
+  /** projection liefert die Projektionsmatrix fuer ein Aspect-Ratio. */
+  projection(aspect: number): Matrix4x4 {
+    return perspectiveMatrix(this.fovY, aspect, this.near, this.far);
+  }
+}
+
+/** Fog buendelt die Tiefen-Nebel-Parameter. enabled == false -> kein Nebel. */
+export interface Fog {
+  enabled: boolean;
+  near: number;
+  far: number;
+  color: ColorInput;
+}
+
+/**
+ * Scene buendelt Kamera + Welt-Attribute (Licht, Nebel, Hintergrund).
+ * Farb-/Graustufenwerte sind als ColorInput hinterlegt (0..255-Graustufe
+ * bzw. [r,g,b] wie bei background()).
+ */
+export interface Scene {
+  cam: Camera;
+  sunDir: Vec3;
+  fog: Fog;
+  background: ColorInput;
+  batchSort: boolean;
+}
+
+/** makeScene erzeugt eine Scene mit sinnvollen Defaults. */
+export function makeScene(): Scene {
+  return {
+    cam: new Camera(),
+    sunDir: new Vec3(0.5, 1.0, 0.3),
+    fog: { enabled: false, near: 0, far: 1, color: { r: 0, g: 0, b: 0, a: 0 } },
+    background: [40, 40, 40],
+    batchSort: false,
+  };
+}
+
+/** applyCamera setzt View + Projection (Aspect aus getWidth/getHeight). */
+export function applyCamera(cam: Camera): void {
+  setProjection(cam.projection(getWidth() / getHeight()));
+  setView(cam.view());
+}
+
+/**
+ * beginScene wendet die Szene an: Hintergrund, Nebel, Kamera und
+ * Sonnenrichtung (in Kamerakoordinaten). Pro Frame aufzurufen.
+ */
+export function beginScene(scene: Scene): void {
+  background(scene.background);
+  if (scene.fog.enabled) {
+    const c = parseColor(scene.fog.color);
+    setFog(scene.fog.near, scene.fog.far, c.r, c.g, c.b, c.a);
+  }
+  applyCamera(scene.cam);
+  const camLight = scene.sunDir.transformDir(scene.cam.view());
+  setLightDirection(camLight.x, camLight.y, camLight.z);
 }
 
 /**

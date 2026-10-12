@@ -1,21 +1,14 @@
 import {
-  background,
+  beginScene,
   drawLine,
   drawMesh,
   DrawStyle,
-  getHeight,
-  getWidth,
   init,
-  lookAtMatrix,
+  makeScene,
   makeSphereMesh,
   multMatrix,
-  perspectiveMatrix,
   rotateMatrix,
   setBatchSort,
-  setFog,
-  setLightDirection,
-  setProjection,
-  setView,
   startAnimation,
   translateMatrix,
   Vec3,
@@ -31,15 +24,15 @@ import {
 const screenW = 1200;
 const screenH = 800;
 
-const fovY = 1.2;
-const zNear = 0.1;
-const zFar = 1000;
-
-const camPos = new Vec3(50, 100, 200);
-const camTarget = new Vec3(0, 0, 0);
-const camUp = new Vec3(0, 1, 0);
-
-const sunDir = new Vec3(0.5, 1.0, 0.3);
+const scene = makeScene();
+scene.cam.pos = new Vec3(50, 100, 200);
+scene.cam.target = new Vec3(0, 0, 0);
+scene.cam.up = new Vec3(0, 1, 0);
+scene.cam.fovY = 1.2;
+scene.cam.near = 0.1;
+scene.cam.far = 1000;
+scene.sunDir = new Vec3(0.5, 1.0, 0.3);
+scene.fog = { enabled: true, near: 100, far: 400, color: { r: 0.25, g: 0.25, b: 0.25, a: 1 } };
 
 const gridStyle: PrimitiveStyle = {
   stroke: "#777774",
@@ -78,16 +71,7 @@ function updateFps(): void {
 function draw(): void {
   updateFps();
 
-  background([40, 40, 40]);
-  setFog(100, 400, 0.25, 0.25, 0.25, 1);
-
-  const view = lookAtMatrix(camPos, camTarget, camUp);
-  const proj = perspectiveMatrix(fovY, getWidth() / getHeight(), zNear, zFar);
-  setProjection(proj);
-  setView(view);
-
-  const camLight = sunDir.transformDir(view);
-  setLightDirection(camLight.x, camLight.y, camLight.z);
+  beginScene(scene);
 
   // Bodengitter (XZ-Ebene bei y=0) aus einzelnen Linien.
   const half = gridSize / 2;

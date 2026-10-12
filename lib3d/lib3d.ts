@@ -34,10 +34,13 @@ export type { Mesh } from "./mesh";
 export { makeCubeMesh, makePyramidMesh, makeSphereMesh } from "./mesh";
 
 // Renderer (Setup, Zustand, 3D-Primitive)
-export type { Instance } from "./renderer";
+export type { Fog, Instance, Scene } from "./renderer";
 export { DrawStyle, EffectMode } from "./renderer";
 export {
+  applyCamera,
   background,
+  beginScene,
+  Camera,
   circle,
   compactBatch,
   fillColor,
@@ -49,6 +52,7 @@ export {
   isMouseDown,
   isMouseUp,
   line,
+  makeScene,
   noLoop,
   point,
   pointSize,
