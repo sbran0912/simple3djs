@@ -821,7 +821,6 @@ export interface Scene {
   sunDir: Vec3;
   fog: Fog;
   background: ColorInput;
-  batchSort: boolean;
 }
 
 /** makeScene erzeugt eine Scene mit sinnvollen Defaults. */
@@ -831,7 +830,6 @@ export function makeScene(): Scene {
     sunDir: new Vec3(0.5, 1.0, 0.3),
     fog: { enabled: false, near: 0, far: 1, color: { r: 0, g: 0, b: 0, a: 0 } },
     background: [40, 40, 40],
-    batchSort: false,
   };
 }
 

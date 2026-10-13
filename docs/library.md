@@ -89,7 +89,6 @@ interface Scene {
   sunDir: Vec3;            // Lichtrichtung (Weltraum)
   fog: Fog;                // Tiefen-Nebel
   background: ColorInput;  // z. B. [40, 40, 40]
-  batchSort: boolean;
 }
 
 function makeScene(): Scene;   // Scene mit Defaults

@@ -123,5 +123,4 @@ try {
 }
 
 setBatchSort(true);
-
 startAnimation(draw);
