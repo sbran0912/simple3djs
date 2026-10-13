@@ -107,6 +107,27 @@ function makeScene(): Scene;   // Scene mit Defaults
   Geometrie geeignet. `compactBatch()` sortiert/fasst manuell zusammen.
 - `getPendingDrawCalls()` / `getPendingInstancedDrawCalls()` – Diagnose.
 
+**Komponenten der `Camera`:**
+
+| Feld | Typ | Default | Bedeutung |
+| --- | --- | --- | --- |
+| `pos` | `Vec3` | `(50, 100, 200)` | Position der Kamera im Weltraum (Augpunkt). |
+| `target` | `Vec3` | `(0, 0, 0)` | Punkt, auf den die Kamera blickt (Blickziel). |
+| `up` | `Vec3` | `(0, 1, 0)` | Oben-Richtung; legt die Rollung der Kamera fest. |
+| `fovY` | `number` | `1.2` | Vertikales Sichtfeld in Bogenmaß (≈ 69°). |
+| `near` | `number` | `0.1` | Nahe Clipping-Ebene; alles davor wird abgeschnitten. |
+| `far` | `number` | `1000` | Ferne Clipping-Ebene; alles dahinter wird abgeschnitten. |
+
+- `pos`, `target` und `up` bestimmen die View-Matrix (`view()`): Die Kamera
+  blickt von `pos` nach `target`, `up` spannt die Hochachse auf. `up` darf
+  nicht parallel zur Blickrichtung sein.
+- `fovY`, `near` und `far` bestimmen die Projektionsmatrix (`projection(aspect)`):
+  `fovY` steuert den Zoom (kleiner = tele, größer = weitwinkel), `near`/`far`
+  den sichtbaren Tiefenbereich. `aspect` (Breite/Höhe) kommt von außen, z. B.
+  aus `getWidth() / getHeight()`.
+- Alle Felder sind öffentlich und können jederzeit geändert werden; die
+  Matrizen werden bei jedem `view()`/`projection()`-Aufruf neu berechnet.
+
 ---
 
 ## 3. Farben
