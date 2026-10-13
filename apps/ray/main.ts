@@ -63,8 +63,6 @@ const pyrWhite: ShapeStyle = {
   mode: DrawStyle.Both,
 };
 
-const screenW = 1600;
-const screenH = 1000;
 const coneLines = 20;
 const camHeight = 140;
 
@@ -171,7 +169,7 @@ function draw(): void {
 
 /* Start */
 try {
-  init(screenW, screenH);
+  init();
 } catch (e) {
   console.error(String(e));
 }

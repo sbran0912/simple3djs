@@ -597,7 +597,8 @@ function onKeyUp(e: KeyboardEvent): void {
   keysDown.delete(e.code);
 }
 
-function onResize(): void {
+// applyViewportSize setzt Canvas-Groesse und Viewport auf die Fenstergroesse.
+function applyViewportSize(): void {
   if (!canvas || !gl) {
     return;
   }
@@ -608,6 +609,10 @@ function onResize(): void {
   canvas.style.width = `${frameW}px`;
   canvas.style.height = `${frameH}px`;
   gl.viewport(0, 0, frameW, frameH);
+}
+
+function onResize(): void {
+  applyViewportSize();
 }
 
 // =================================================================
@@ -936,19 +941,16 @@ export function setLightDirection(x: number, y: number, z: number): void {
 
 /**
  * init initialisiert Canvas, WebGL2-Kontext, Shader und Batch-Zustand.
+ * Die Canvas-Groesse folgt dem Fenster (window.innerWidth/innerHeight).
  * Wirft einen Fehler bei Problemen.
  */
-export function init(w: number, h: number): void {
+export function init(): void {
   if (typeof document === "undefined" || !document.body) {
     throw new Error("init benoetigt einen Browser-Kontext (document.body).");
   }
 
   canvas = document.createElement("canvas");
-  canvas.width = w;
-  canvas.height = h;
   canvas.style.display = "block";
-  canvas.style.width = `${w}px`;
-  canvas.style.height = `${h}px`;
   document.body.appendChild(canvas);
 
   const ctx = canvas.getContext("webgl2", { antialias: true, alpha: false });
@@ -1012,9 +1014,8 @@ export function init(w: number, h: number): void {
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-  frameW = w;
-  frameH = h;
-  gl.viewport(0, 0, w, h);
+  // Canvas-Groesse an das Fenster angleichen (auch beim ersten Start).
+  applyViewportSize();
   startTime = performance.now() / 1000;
 
   // Batch-Zustand initialisieren.

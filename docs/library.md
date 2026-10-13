@@ -33,7 +33,7 @@ function draw(): void {
 }
 
 try {
-  init(1200, 800);                  // Canvas + WebGL2-Kontext + Shader
+  init();                           // Canvas + WebGL2-Kontext + Shader
 } catch (e) {
   console.error(String(e));
 }
@@ -47,7 +47,7 @@ Puffer-/Canvas-Verwaltung übernimmt die Bibliothek.
 
 | Funktion | Bedeutung |
 | --- | --- |
-| `init(w, h)` | Canvas, WebGL2-Kontext, Shader, Batch-Zustand. Wirft bei Fehlern. |
+| `init()` | Canvas, WebGL2-Kontext, Shader, Batch-Zustand. Die Canvas-Größe folgt dem Fenster (`window.innerWidth/innerHeight`). Wirft bei Fehlern. |
 | `startAnimation(draw)` | Startet die Schleife (`requestAnimationFrame`); `draw` wird jedes Frame aufgerufen. |
 | `noLoop()` | Stoppt die Animations-Schleife. |
 | `getWidth()` / `getHeight()` | Canvas-Größe in Pixeln. |
@@ -476,7 +476,7 @@ function draw(): void {
   drawMesh(ball.geometry, ballStyle, ball.modelMatrix());
 }
 
-try { init(1200, 800); } catch (e) { console.error(String(e)); }
+try { init(); } catch (e) { console.error(String(e)); }
 startAnimation(draw);
 ```
 

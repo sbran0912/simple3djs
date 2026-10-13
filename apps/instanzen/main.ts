@@ -28,9 +28,6 @@ import {
 // oben (+Y) gesehen - im Uhrzeigersinn.
 // ====================================================================
 
-const screenW = 1200;
-const screenH = 800;
-
 const scene = makeScene();
 scene.cam.pos = new Vec3(120, 240, 460);
 scene.cam.target = new Vec3(0, 0, 0);
@@ -164,7 +161,7 @@ function draw(): void {
 
 /* Start */
 try {
-  init(screenW, screenH);
+  init();
 } catch (e) {
   console.error(String(e));
 }
