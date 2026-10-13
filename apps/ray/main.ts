@@ -21,7 +21,7 @@ import {
   raycastSegment,
   makeBody,
   type Face,
-} from "../../bodies/bodies";
+} from "../../lib3d/bodies";
 
 // ====================================================================
 // Rayleigh-Beispiel (Port von simple3d/apps/ray):

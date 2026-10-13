@@ -35,7 +35,7 @@ export { makeCubeMesh, makePyramidMesh, makeSphereMesh } from "./mesh";
 
 // Renderer (Setup, Zustand, 3D-Primitive)
 export type { Fog, Instance, Scene } from "./renderer";
-export { DrawStyle, EffectMode } from "./renderer";
+export { DrawStyle, EffectMode, Key } from "./renderer";
 export {
   applyCamera,
   background,
@@ -49,6 +49,8 @@ export {
   getPendingInstancedDrawCalls,
   getWidth,
   init,
+  isKeyDown,
+  isKeyPressed,
   isMouseDown,
   isMouseUp,
   line,

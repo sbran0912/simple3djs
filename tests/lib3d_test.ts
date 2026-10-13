@@ -32,7 +32,7 @@ import {
   Vec3,
   type ShapeStyle,
 } from "../lib3d/lib3d";
-import { closestPointToFace, type Face } from "../bodies/bodies";
+import { closestPointToFace, type Face } from "../lib3d/bodies";
 
 let fails = 0;
 

@@ -44,6 +44,59 @@ export enum EffectMode {
 }
 
 /**
+ * Key ist eine Auswahl haeufiger Tasten. Die Werte sind DOM-Codes aus
+ * KeyboardEvent.code (layout-unabhaengig = physische Taste). isKeyDown/
+ * isKeyPressed nehmen jeden code-String an; die Enum ist reine Bequemlichkeit.
+ */
+export enum Key {
+  Space = "Space",
+  Escape = "Escape",
+  Enter = "Enter",
+  Tab = "Tab",
+  Backspace = "Backspace",
+  Insert = "Insert",
+  Delete = "Delete",
+  ArrowLeft = "ArrowLeft",
+  ArrowRight = "ArrowRight",
+  ArrowUp = "ArrowUp",
+  ArrowDown = "ArrowDown",
+  PageUp = "PageUp",
+  PageDown = "PageDown",
+  Home = "Home",
+  End = "End",
+  CapsLock = "CapsLock",
+  Minus = "Minus",
+  Equal = "Equal",
+  BracketLeft = "BracketLeft",
+  BracketRight = "BracketRight",
+  Backslash = "Backslash",
+  Semicolon = "Semicolon",
+  Quote = "Quote",
+  Backquote = "Backquote",
+  Comma = "Comma",
+  Period = "Period",
+  Slash = "Slash",
+  Digit0 = "Digit0", Digit1 = "Digit1", Digit2 = "Digit2", Digit3 = "Digit3",
+  Digit4 = "Digit4", Digit5 = "Digit5", Digit6 = "Digit6", Digit7 = "Digit7",
+  Digit8 = "Digit8", Digit9 = "Digit9",
+  A = "KeyA", B = "KeyB", C = "KeyC", D = "KeyD", E = "KeyE", F = "KeyF",
+  G = "KeyG", H = "KeyH", I = "KeyI", J = "KeyJ", K = "KeyK", L = "KeyL",
+  M = "KeyM", N = "KeyN", O = "KeyO", P = "KeyP", Q = "KeyQ", R = "KeyR",
+  S = "KeyS", T = "KeyT", U = "KeyU", V = "KeyV", W = "KeyW", X = "KeyX",
+  Y = "KeyY", Z = "KeyZ",
+  F1 = "F1", F2 = "F2", F3 = "F3", F4 = "F4", F5 = "F5", F6 = "F6",
+  F7 = "F7", F8 = "F8", F9 = "F9", F10 = "F10", F11 = "F11", F12 = "F12",
+  ShiftLeft = "ShiftLeft",
+  ShiftRight = "ShiftRight",
+  ControlLeft = "ControlLeft",
+  ControlRight = "ControlRight",
+  AltLeft = "AltLeft",
+  AltRight = "AltRight",
+  MetaLeft = "MetaLeft",
+  MetaRight = "MetaRight",
+}
+
+/**
  * Instance beschreibt eine Instanz fuer das GPU-Instancing: eine Modell-Matrix
  * (row-major, wie Matrix4x4) und eine Farbe.
  */
@@ -145,6 +198,11 @@ let startTime = 0;
 let mouseX = 0;
 let mouseY = 0;
 let mouseStatus = 0;
+
+// Tastatur: gedrueckte Tasten (keysDown) und einmalig konsumierte Druckkanten
+// (keysPressed). Schluessel ist der KeyboardEvent.code.
+const keysDown = new Set<string>();
+const keysPressed = new Set<string>();
 
 // Aktueller Zeichenzustand.
 let state: DrawState = {
@@ -522,6 +580,23 @@ function onPointerUp(e: PointerEvent): void {
   mouseStatus = 2;
 }
 
+function onKeyDown(e: KeyboardEvent): void {
+  // Kante nur beim ersten Down: keydown wiederholt sich bei gehaltener Taste.
+  if (!keysDown.has(e.code)) {
+    keysPressed.add(e.code);
+  }
+  keysDown.add(e.code);
+
+  // ESC stoppt die Animations-Schleife (Analogon zum C++-Ausstieg).
+  if (e.code === "Escape") {
+    noLoop();
+  }
+}
+
+function onKeyUp(e: KeyboardEvent): void {
+  keysDown.delete(e.code);
+}
+
 function onResize(): void {
   if (!canvas || !gl) {
     return;
@@ -649,6 +724,27 @@ export function isMouseDown(): boolean {
 export function isMouseUp(): boolean {
   if (mouseStatus === 2) {
     mouseStatus = 0;
+    return true;
+  }
+  return false;
+}
+
+/**
+ * isKeyDown gibt true zurueck, solange die Taste gedrueckt ist (Dauerdruck,
+ * z. B. fuer laufende Steuerung pro Frame). key ist KeyboardEvent.code bzw.
+ * ein Key-Wert.
+ */
+export function isKeyDown(key: string): boolean {
+  return keysDown.has(key);
+}
+
+/**
+ * isKeyPressed gibt einmalig true zurueck, wenn die Taste seit der letzten
+ * Abfrage gedrueckt wurde (konsumierend wie isMouseUp, fuer Trigger).
+ */
+export function isKeyPressed(key: string): boolean {
+  if (keysPressed.has(key)) {
+    keysPressed.delete(key);
     return true;
   }
   return false;
@@ -944,10 +1040,16 @@ export function init(w: number, h: number): void {
   batchVerts = [];
   batchCmds = [];
 
+  // Tastatur-Zustand zuruecksetzen.
+  keysDown.clear();
+  keysPressed.clear();
+
   // Eingabe-Callbacks.
   canvas.addEventListener("pointermove", onPointerMove);
   canvas.addEventListener("pointerdown", onPointerDown);
   canvas.addEventListener("pointerup", onPointerUp);
+  window.addEventListener("keydown", onKeyDown);
+  window.addEventListener("keyup", onKeyUp);
   window.addEventListener("resize", onResize);
 }
 

@@ -12,9 +12,9 @@ import {
   multMatrix,
   rotateMatrix,
   translateMatrix,
-} from "../lib3d/mat4";
-import { type Mesh } from "../lib3d/mesh";
-import { Vec3 } from "../lib3d/vec";
+} from "./mat4";
+import { type Mesh } from "./mesh";
+import { Vec3 } from "./vec";
 
 /** Face ist ein Dreieck eines Meshes samt (normierter) Flaechennormale. */
 export interface Face {

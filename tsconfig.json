@@ -12,5 +12,5 @@
     "verbatimModuleSyntax": true,
     "types": []
   },
-  "include": ["lib3d", "bodies", "apps", "tests"]
+  "include": ["lib3d", "apps", "tests"]
 }
